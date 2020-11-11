@@ -3,13 +3,16 @@
 }
 
 .App-logo {
-  height: 40vmin;
+  height: auto;
+  width: 50%;
   pointer-events: none;
+  align-self: center;
+  max-width: 100px;
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
-    animation: App-logo-spin infinite 20s linear;
+    animation: App-logo-spin infinite 1.2s linear;
   }
 }
 
@@ -18,8 +21,9 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  align-items: left;
+  justify-content: left;
+  align-self: left;
   font-size: calc(10px + 2vmin);
   color: white;
 }
@@ -28,11 +32,85 @@
   color: #61dafb;
 }
 
+.nav_item{
+  display: inline-block;
+  padding: 2%;
+  font-size: x-large;
+  
+}
+#logout{
+  text-align: right;
+  font-size: x-small;
+  padding: 30px;
+  padding-bottom: 0;
+  padding-top: 0;
+}
 @keyframes App-logo-spin {
-  from {
+  0%{
     transform: rotate(0deg);
   }
-  to {
-    transform: rotate(360deg);
+  50%{
+    transform: rotate(10deg);
+  }
+  100%{
+    transform: rotate(0deg);
   }
 }
+#username{
+  color:black;
+  margin: 15px;
+}
+#password{
+  color: black;
+  margin: 15px;
+}
+#login{
+  color: black;
+  margin: 15px;
+}
+#submitScrap{
+  color: black;
+  margin: 15px;
+}
+.selection{
+  color: black;
+  background-color: black;
+}
+.selector{
+  color: black;
+}
+#prodIDLabel {
+  /* Other styling... */
+  text-align: right;
+  clear: both;
+  float:left;
+  margin-right:15px;
+}
+#selectIdDiv{
+  display:flex; 
+  flex-direction: row;
+}
+#selectFailure{
+  display:flex; 
+  flex-direction: row;
+}
+#totalCost{
+  display:flex; 
+  flex-direction: row;
+
+}
+.inputBox{
+  color:black;
+  
+
+}
+#prodDesc{
+  margin-left: 20px;
+}
+/* .newScrapForm{
+  margin: 20px;
+  text-align: left;
+  align-self: left;
+} */
+
+
