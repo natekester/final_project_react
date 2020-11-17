@@ -1,5 +1,4 @@
 import React, {Component} from "react";
-import logo from './logo.svg';
 
 import './App.css';
 import TopLayout from './TopLayout.js';
@@ -15,6 +14,7 @@ import {
   withRouter
   
 } from "react-router-dom";
+import ScatterGraph from "./ScatterGraph";
 
 
 
@@ -26,10 +26,11 @@ class App extends Component {
 
 
     this.loggedIn = this.loggedIn.bind(this);
+    this.pushLogin = this.pushLogin.bind(this);
+    this.logout = this.logout.bind(this);
 
     // login('vitor', '123')
     
-    console.log(` our local storage refresh token value: ${localStorage.getItem("refresh_token")}`)
     if (localStorage.getItem("refresh_token") === null) {
       this.pushLogin()
 
@@ -38,7 +39,6 @@ class App extends Component {
 
       const isRefValid = async () => {
         const valid = await isRefreshValid();
-        console.log(`isref (App) valid: ${valid}`)
         return valid
       }
       
@@ -48,12 +48,9 @@ class App extends Component {
 
       if(valid === true){
 
-        console.log(`attempting to change the state of display and toplayout`)
         this.pushOpenScrap();
-        console.log(`is refresh valid? ${valid}`)
 
       }else if (valid == false){
-        console.log(`is refresh valid? ${valid}`)
         this.pushLogin()
 
       }
@@ -61,7 +58,6 @@ class App extends Component {
   }
 
   pushLogin(){
-    console.log("changing the push hstory to /login")
 
     
     this.props.history.push("/login");
@@ -72,7 +68,6 @@ class App extends Component {
 
 
   pushOpenScrap(){
-    console.log("changing the push hstory to /openscrap")
     this.props.history.push("/openScrap?page=1");
 
 
@@ -109,24 +104,24 @@ class App extends Component {
           <Switch>
 
             <Route path="/newScrap">
-              <TopLayout logout={this.logout} graphDisplay={this.graphDisplay} openScrapListDisplay={this.openScrapListDisplay} closedScrapListDisplay={this.closedScrapListDisplay} createNewScrapDisplay={this.createNewScrapDisplay}></TopLayout>
-              <NewScrap></NewScrap>
+              <TopLayout pushLogin={this.pushLogin} logout={this.logout} graphDisplay={this.graphDisplay} openScrapListDisplay={this.openScrapListDisplay} closedScrapListDisplay={this.closedScrapListDisplay} createNewScrapDisplay={this.createNewScrapDisplay}></TopLayout>
+              <NewScrap pushLogin={this.pushLogin} logout={this.logout} ></NewScrap>
             </Route>
 
             <Route path="/openScrap">
-            <TopLayout logout={this.logout} graphDisplay={this.graphDisplay} openScrapListDisplay={this.openScrapListDisplay} closedScrapListDisplay={this.closedScrapListDisplay} createNewScrapDisplay={this.createNewScrapDisplay}></TopLayout>
+            <TopLayout pushLogin={this.pushLogin} logout={this.logout} graphDisplay={this.graphDisplay} openScrapListDisplay={this.openScrapListDisplay} closedScrapListDisplay={this.closedScrapListDisplay} createNewScrapDisplay={this.createNewScrapDisplay}></TopLayout>
 
-              <OpenScrapList></OpenScrapList>
+              <OpenScrapList pushLogin={this.pushLogin} logout={this.logout} ></OpenScrapList>
             </Route>
 
             <Route path="/closedScrap">
-              <TopLayout logout={this.logout} graphDisplay={this.graphDisplay} openScrapListDisplay={this.openScrapListDisplay} closedScrapListDisplay={this.closedScrapListDisplay} createNewScrapDisplay={this.createNewScrapDisplay}></TopLayout>
-              <ClosedScrapList></ClosedScrapList>
+              <TopLayout pushLogin={this.pushLogin} logout={this.logout} graphDisplay={this.graphDisplay} openScrapListDisplay={this.openScrapListDisplay} closedScrapListDisplay={this.closedScrapListDisplay} createNewScrapDisplay={this.createNewScrapDisplay}></TopLayout>
+              <ClosedScrapList pushLogin={this.pushLogin} logout={this.logout} ></ClosedScrapList>
             </Route>
 
             <Route path="/graphScrap">
-              <TopLayout logout={this.logout} graphDisplay={this.graphDisplay} openScrapListDisplay={this.openScrapListDisplay} closedScrapListDisplay={this.closedScrapListDisplay} createNewScrapDisplay={this.createNewScrapDisplay}></TopLayout>
-              <ScrapGraph></ScrapGraph>
+              <TopLayout pushLogin={this.pushLogin} logout={this.logout} graphDisplay={this.graphDisplay} openScrapListDisplay={this.openScrapListDisplay} closedScrapListDisplay={this.closedScrapListDisplay} createNewScrapDisplay={this.createNewScrapDisplay}></TopLayout>
+              <ScrapGraph pushLogin={this.pushLogin} logout={this.logout} ></ScrapGraph>
             </Route>
 
             <Route path="/login">

@@ -1,12 +1,14 @@
 
 import React, {Component} from "react";
 import './App.css';
-import {getProd, get_failures, submitScrap} from "./Functions";
+import {getProd, getFailures, submitScrap} from "./Functions";
 
 var descriptions;
 var ids;
 var costUnits;
 var units;
+
+//TODO surround all DB functions from .func with a try and catch - that calls the force login prop method.
 
 class NewScrap extends Component {
     constructor(props) {
@@ -30,6 +32,7 @@ class NewScrap extends Component {
             disabled: 'true',
             display: '',
             submitted: '',
+            lotID: '',
 
 
 
@@ -41,9 +44,31 @@ class NewScrap extends Component {
           this.submitScrap = this.submitScrap.bind(this);
           this.updateSelectedID=this.updateSelectedID.bind(this)
           this.updateFailure=this.updateFailure.bind(this)
+          this.updateLotID = this.updateLotID.bind(this);
 
           
     }
+
+    updateLotID = (event) => {
+        
+        this.setState({
+            lotID: event.target.value
+        });
+
+        if(this.state.selectedID == '' || event.target.value == '' || this.state.totalCost == 0 || this.state.selectedFailure == ''){
+            this.setState({
+                disabled: "true",
+            })
+        }else{
+            
+            this.setState({
+                disabled: "",
+            })
+
+        }
+    }
+
+
 
     updateSelectedID = (event) => {
         var index;
@@ -68,7 +93,13 @@ class NewScrap extends Component {
         const unit = units[index];
 
         const fetchFailures = async () => {
-            const failures = await get_failures(id);
+            var failures;
+            try{
+                failures = await getFailures(id);
+            }
+            catch(e){
+                this.props.pushLogin();
+            }
             console.log(`failures in newscrap: ${failures}`)
             
             this.setState({
@@ -95,17 +126,6 @@ class NewScrap extends Component {
 
         fetchFailures();
 
-        if(selected == '' || this.state.selectedFailure == '' || this.state.totalCost == 0){
-            this.setState({
-                disabled: "true",
-            })
-        }else{
-            
-            this.setState({
-                disabled: "",
-            })
-
-        }
 
         
 
@@ -118,7 +138,9 @@ class NewScrap extends Component {
             selectedFailure: event.target.value
         });
 
-        if(this.state.selectedID == '' || event.target.value == '' || this.state.totalCost == 0){
+        console.log(this.state.selectedID, event.target.value, this.state.totalCost, this.state.lotID)
+
+        if(this.state.selectedID == '' || event.target.value == '' || this.state.totalCost == 0 || this.state.lotID === ''){
             this.setState({
                 disabled: "true",
             })
@@ -132,7 +154,7 @@ class NewScrap extends Component {
     }
 
     updateUnits = (event) => {
-        const cost = event.target.value * this.state.costPerUnit
+        const cost = Math.round((event.target.value * this.state.costPerUnit)*100)/100
         
         this.setState({
             unitsLost: event.target.value,
@@ -140,7 +162,7 @@ class NewScrap extends Component {
         })
 
 
-        if(cost == 0 || this.state.selectedID === '' || this.state.selectedFailure === ''){
+        if(cost == 0 || this.state.lotID === '' || this.state.selectedID === '' || this.state.selectedFailure === ''){
             this.setState({
                 disabled: "true",
             })
@@ -162,35 +184,51 @@ class NewScrap extends Component {
 
 
     async loadProd(){
-        const user = window.localStorage.getItem('username');
+        
+        try{
+            const user = window.localStorage.getItem('username');
 
 
-        let {prodID, prodDesc, unitCost, unit, id} = await getProd();
-        console.log(`BLAM our prod id list is: ${prodID} , with username: ${user}`)
+            let {prodID, prodDesc, unitCost, unit, id} = await getProd();
+        
 
-        costUnits = unitCost;
-        descriptions = prodDesc;
-        ids = id;
-        units = unit;
+            console.log(`BLAM our prod id list is: ${prodID} , with username: ${user}`)
 
-        this.setState({
-            loaded: "true",
-            prodID: prodID,
-            prodDesc: "",
-            id: "",
-            selectedID:"",
-            failureMode: [''],
-            selectedFailure:"",
-            costPerUnit: "",
-            unit: "",
-            unitsLost: '',
-            totalCost: '',
-            loggedInUser: user,
-            disabled: 'true',
-            display: ''
-          });
+            costUnits = unitCost;
+            descriptions = prodDesc;
+            ids = id;
+            units = unit;
 
-          console.log(`BLAM II our username: ${this.state.loggedInUser}`)
+            this.setState({
+                loaded: "true",
+                prodID: prodID,
+                prodDesc: "",
+                id: "",
+                selectedID:"",
+                failureMode: [''],
+                selectedFailure:"",
+                costPerUnit: "",
+                unit: "",
+                unitsLost: '',
+                totalCost: '',
+                loggedInUser: user,
+                disabled: 'true',
+                display: '',
+                lotID: ''
+            });
+
+            console.log(`BLAM II our username: ${this.state.loggedInUser}`)
+        }
+        catch(err){
+
+            console.log(err)
+
+            // this.props.logout();
+            this.props.pushLogin();
+
+        }
+        
+
 
 
         
@@ -204,9 +242,10 @@ class NewScrap extends Component {
         const units = this.state.unitsLost;
         const prodID = this.state.id;
         const failure = this.state.selectedFailure;
+        const lotID = this.state.lotID;
 
         const submitScrapNow = async () => {
-            const submitted = await submitScrap(user, cost, units, prodID, failure);
+            const submitted = await submitScrap(lotID, user, cost, units, prodID, failure);
             return submitted;
         }
             
@@ -257,6 +296,15 @@ class NewScrap extends Component {
                     <label> User: </label>  {this.state.loggedInUser}
                     </div>
                 </div>
+
+                <div className="row" >
+                    <div className='col-md-10 col-xs-10' id="selectFailure">
+                    <label> lot ID: </label>
+                    <input  className="inputBox" type="textbox" onChange={this.updateLotID} required></input>
+                    </div>
+                    
+                </div>
+
 
                 <div className="row" >
                     <div className='col-md-12 col-xs-12' id="selectIdDiv">

@@ -1,11 +1,3 @@
-import jwt_decode from "jwt-decode";
-import { useHistory } from "react-router-dom";
-
-
- 
-// var token = "eyJ0eXAiO.../// jwt token";
-// var decoded = jwt_decode(token);
-
 
 const baseURL = "http://localhost:8000/";
 const loginURL = baseURL + "api/login/";
@@ -22,33 +14,9 @@ const checkRefURL = baseURL + "api/check_refresh_token/"
 
 
 
-
-export default {loginURL, baseURL};
-
-
-
-/*        const response = await fetch(loginURL, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${window.localStorage.getItem('token')}`,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                body: messageValue,
-                user_name: usernameValue
-            })
-        });
-
-        
-        const body = await response.json()
-
-        return body */
-
+//TODO - make sure each function throws an error if we can't validate and recieve a token- so we can push a new login.
 
 async function login(userName, password){
-        console.log('logging in')
-        console.log(`our passed username is ${userName}`);
-        console.log('starting fetch')
         
         const response = await fetch(loginURL, {
             method: 'POST',
@@ -60,32 +28,38 @@ async function login(userName, password){
 
 
         const body = await response.json()
-        
-        console.log(body)
-        console.log(body['error'])
 
         const token = body['token'];
         const refreshToken = body['refresh_token'];
         const refID = body['ref_id'];
+        
+        if( body['error'] == "creditials incorrect")
+        {
+            return false
 
-        window.localStorage.setItem('token', token)
-        window.localStorage.setItem('refresh_token', refreshToken)
-        window.localStorage.setItem('ref_id', refID)
-        window.localStorage.setItem('username', userName)
+        }else{
+
+            //TODO: change to cache for better security.
+
+            window.localStorage.setItem('token', token)
+            window.localStorage.setItem('refresh_token', refreshToken)
+            window.localStorage.setItem('ref_id', refID)
+            window.localStorage.setItem('username', userName)
+
+            return true
+
+        }
 
 }
 
 async function logout(){
     const userName = localStorage.getItem('username');
 
-    console.log(`our passed username is ${userName}`);
-    console.log('starting fetch')
     localStorage.removeItem('token')
     window.localStorage.removeItem('refresh_token')
     window.localStorage.removeItem('ref_id')
     window.localStorage.removeItem('username')
 
-    
     const response = await fetch(logoutURL, {
         method: 'POST',
         body: JSON.stringify({
@@ -98,8 +72,6 @@ async function logout(){
 
     const body = await response.json()
     
-    console.log(body['logged out'])
-    console.log('removing all local memory items')
 
 
     return('logged out')
@@ -121,16 +93,20 @@ async function isRefreshValid() {
             })
         });
 
+        if (response.status === 403){
+            window.localStorage.removeItem('refresh_token');
+            window.localStorage.removeItem('ref_id');
+            return false
+        }
+
         const data = await response.json()
         const token = data['token']
 
         if (token.length > 0){
-            console.log(` true our recieved validation was: ${token}`)
     
             return true
 
         }else{
-            console.log(`our recieved validation was: ${token}`)
     
             return false
     
@@ -157,9 +133,6 @@ async function isTokenValid() {
         return false
 
     }
-
-
-
 } 
 
 async function getNewToken() {
@@ -180,10 +153,8 @@ async function getNewToken() {
 
         const body = await response.json()
         
-        console.log(body)
         
         if (body['error'] != null){
-            console.log(body['error'])
             
         }
 
@@ -195,34 +166,21 @@ async function getNewToken() {
 
 async function getOpenScrap(page){
 
-        var valid = isTokenValid();
-        if(valid === false){
-            await isRefreshValid();
+    const openURL = openScrapURL + `?page=${page}`
+
+    var valid = await isTokenValid();
+    if(valid === false){
+        const ref = await isRefreshValid()
+
+        if(ref == true){
             await getNewToken();
         }
-
-        const response = await fetch(openScrapURL, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${window.localStorage.getItem('token')}`,
-                'Content-Type': 'application/json',
-            },
-        });
-
-        
-        const body = await response.json()
-
-        return body 
-}
-
-async function getClosedScrap(page){
-
-    var valid = isTokenValid();
-    if(valid === false){
-        await getNewToken();
+        else{
+            throw "need to sign back in"
+        }
     }
 
-    const response = await fetch(closedScrapURL, {
+    const response = await fetch(openURL, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${window.localStorage.getItem('token')}`,
@@ -231,19 +189,174 @@ async function getClosedScrap(page){
     });
 
     
-    const body = await response.json()
+    const data = await response.json()
 
-    return body 
+    page = data[0][2];
+    const hasNext = data[0][0];
+    const hasPrev = data[0][1];
+    const numItem = data[0][3];
+    let prodID = [];
+    let desc = [];
+    let failure = [];
+    let isOpen = [];
+    let lotID = [];
+    let user = [];
+    let time = [];
+    let units = [];
+    let index = [];
+    let cost = [];
+    const lenData = Object.keys(data).length;
+
+    //data[0] = [page.has_next(), page.has_previous(), curr_page]
+
+//db return view: data[f'{position}'] = [item.prod_id.prod_id, item.prod_id.description, item.failure.failure_mode, item.is_open, item.lot_id, item. item.user.username, item.total_cost, item.time.strftime("%m/%d/%Y, %H:%M:%S"), item.units_scrapped]
+
+
+    for(var i=1; i<lenData; i++){
+
+        prodID.push(data[`${i}`][0])
+        desc.push(data[`${i}`][1])
+        failure.push(data[`${i}`][2])
+        isOpen.push(data[`${i}`][3])
+        lotID.push(data[`${i}`][4])
+        user.push(data[`${i}`][5])
+        cost.push(data[`${i}`][6])
+        time.push(data[`${i}`][7])
+        units.push(data[`${i}`][8])
+        index.push(data[`${i}`][9])
+
+
+    }
+
+
+    return {page, hasNext, hasPrev, numItem, prodID, desc, failure, isOpen, lotID, user, cost, time, units, index}
+}
+
+async function getClosedScrap(page){
+    const closedURL = closedScrapURL + `?page=${page}`
+
+    var valid = await isTokenValid();
+    if(valid === false){
+        const ref = await isRefreshValid()
+
+        if(ref == true){
+            await getNewToken();
+        }
+        else{
+            throw "need to sign back in"
+        }
+    }
+
+    const response = await fetch(closedURL, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${window.localStorage.getItem('token')}`,
+            'Content-Type': 'application/json',
+        }
+    });
+
+    
+    const data = await response.json()
+
+    page = data[0][2];
+    const hasNext = data[0][0];
+    const hasPrev = data[0][1];
+    const numItem = data[0][3];
+    let prodID = [];
+    let desc = [];
+    let failure = [];
+    let isOpen = [];
+    let lotID = [];
+    let user = [];
+    let time = [];
+    let units = [];
+    let index = [];
+    let cost = [];
+    const lenData = Object.keys(data).length;
+
+    //data[0] = [page.has_next(), page.has_previous(), curr_page]
+
+//db return view: data[f'{position}'] = [item.prod_id.prod_id, item.prod_id.description, item.failure.failure_mode, item.is_open, item.lot_id, item. item.user.username, item.total_cost, item.time.strftime("%m/%d/%Y, %H:%M:%S"), item.units_scrapped]
+
+
+    for(var i=1; i<lenData; i++){
+
+        prodID.push(data[`${i}`][0])
+        desc.push(data[`${i}`][1])
+        failure.push(data[`${i}`][2])
+        isOpen.push(data[`${i}`][3])
+        lotID.push(data[`${i}`][4])
+        user.push(data[`${i}`][5])
+        cost.push(data[`${i}`][6])
+        time.push(data[`${i}`][7])
+        units.push(data[`${i}`][8])
+        index.push(data[`${i}`][9])
+
+
+    }
+
+
+    return {page, hasNext, hasPrev, numItem, prodID, desc, failure, isOpen, lotID, user, cost, time, units, index}
+}
+
+async function getGraphScrap(page){
+
+    var valid = await isTokenValid();
+    if(valid === false){
+        const ref = await isRefreshValid()
+
+        if(ref == true){
+            await getNewToken();
+        }
+        else{
+            throw "need to sign back in"
+        }
+    }
+
+    const response = await fetch(graphURL, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${window.localStorage.getItem('token')}`,
+            'Content-Type': 'application/json',
+        }
+    });
+
+    
+    var data = await response.json();
+    var products = data[1];
+    var labels = data[2];
+    data = data[0];
+
+    const prod1 = data[0];
+    const prod2 = data[1];
+    const prod3 = data[2];
+    const prod1Desc = products[0];
+    const prod2Desc = products[1];
+    const prod3Desc = products[2];
+    console.log(`our prod data is: ${prod1}| ${prod2} | ${prod3}`)
+    console.log(`our prod desc is: ${prod1Desc}| ${prod2Desc} | ${prod3Desc}`)
+    console.log(`our lables are: ${labels}`)
+
+
+
+    return {prod1, prod2, prod3, prod1Desc,prod2Desc,prod3Desc, labels}
+
 }
 
 async function getProd(){
 
-    var valid = await isTokenValid();
-    console.log(`our valid response was ${valid}`)
-    if(valid === false){
-        await getNewToken();
-        //TODO add a try/catch that forces you to log out.
 
+
+    var valid = await isTokenValid();
+    if(valid === false){
+        const ref = await isRefreshValid()
+
+        if(ref == true){
+            await getNewToken();
+        }
+        else{
+            throw "need to sign back in"
+        }
     }
 
     const response = await fetch(prodURL, {
@@ -257,7 +370,6 @@ async function getProd(){
     
     const data = await response.json()
 
-    console.log(data)
 
 
 
@@ -279,25 +391,26 @@ async function getProd(){
 
     }
 
-    console.log(`Our list of prds is ${prodID}`)
-    console.log(prodID[0])
 
 
     return {prodID, prodDesc, unitCost, unit, id};
 }
 
-async function get_failures(id){
+async function getFailures(id){
 
     const url = failURL + `?id=${id}`;
 
 
     var valid = await isTokenValid();
-    console.log(`our valid response was ${valid}`)
     if(valid === false){
-        await isRefreshValid()
-        await getNewToken();
-        //TODO add a try/catch that forces you to log out.
+        const ref = await isRefreshValid()
 
+        if(ref == true){
+            await getNewToken();
+        }
+        else{
+            throw "need to sign back in"
+        }
     }
 
 
@@ -313,7 +426,6 @@ async function get_failures(id){
     
     const data = await response.json()
 
-    console.log(data)
 
 
 
@@ -328,7 +440,6 @@ async function get_failures(id){
 
     }
 
-    console.log(`Our list of failures is ${failures}`)
    
 
 
@@ -337,16 +448,19 @@ async function get_failures(id){
 
 }
 
-async function submitScrap(user, cost, units, prodID, failure){
+async function submitScrap(lotID, user, cost, units, prodID, failure){
     
+
     var valid = await isTokenValid();
     if(valid === false){
-    
-        await getNewToken();
-        //TODO add a try/catch that forces you to log out.
-        //Also we need to check if our refresh token is valid.
+        const ref = await isRefreshValid()
 
-        
+        if(ref == true){
+            await getNewToken();
+        }
+        else{
+            throw "need to sign back in"
+        }
     }
 
     const response = await fetch(createScrapURL, {
@@ -361,23 +475,19 @@ async function submitScrap(user, cost, units, prodID, failure){
             units: units,
             prodID: prodID,
             failure: failure,
+            lotID: lotID
         })
     });
 
     const data = await response.json()
 
     if(data['scrap'] == 'scrap created'){
-        console.log('yay, scrap created')
         return true
     }else{
         return false
     }
-
-
-
 }
 
 
 
-
-export{ submitScrap, get_failures, getProd, login, logout, isRefreshValid, getNewToken, isTokenValid }
+export {getGraphScrap, submitScrap, getFailures, getProd, login, logout, isRefreshValid, getNewToken, isTokenValid, getOpenScrap, getClosedScrap }

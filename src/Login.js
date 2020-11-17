@@ -9,7 +9,8 @@ class Login extends Component {
 
         this.state ={
             username: '',
-            password: ''
+            password: '',
+            error: '',
 
         };
 
@@ -24,9 +25,20 @@ class Login extends Component {
 
         
 
-        await login(this.state.username, this.state.password)
+        const response = await login(this.state.username, this.state.password)
 
-        this.props.loggedIn()
+        if(response === true ){
+            this.props.loggedIn()
+        }else{
+            this.setState(
+                {
+                    error: <h3> Credentials Incorrect. Try Again. </h3>
+                }
+            )
+
+        }
+
+        
     }
 
     updateUsername = (event) => {
@@ -58,6 +70,7 @@ class Login extends Component {
                 <input id="password" type="password" placeholder="Enter Password" name="psw" onChange={this.updatePassword} required></input>
                 <br></br>
                 <input id="login" type="button" onClick={this.login} value="Login"></input>
+                {this.state.error}
 
             </div>
         );
