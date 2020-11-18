@@ -1,7 +1,7 @@
 
 import React, {Component} from "react";
 import {login, logout, isRefreshValid, getNewToken, isTokenValid } from "./Functions";
-
+import tracks from './tracks.png';
 
 class Login extends Component {
     constructor(props) {
@@ -45,7 +45,6 @@ class Login extends Component {
         this.setState({
             username: event.target.value
         });
-        console.log(`username is now: ${this.state.username}`)
     }
 
 
@@ -53,7 +52,6 @@ class Login extends Component {
         this.setState({
             password: event.target.value
         });
-        console.log(`password is now: ${this.state.password}`)
 
     }
 
@@ -63,6 +61,14 @@ class Login extends Component {
     render(){
         return (
             <div>
+                <br></br>
+                <div className="row" id="scrapLogo">
+                    <h2 className="scrapTracker">Scrap Tracker</h2>
+                    <img id="tracks" src={tracks} alt="Logo" />
+                </div>
+                
+                <br></br>
+
                 <label for="uname"><b>Username</b></label>
                 <input id="username" type="text" placeholder="Enter Username" name="uname" onChange={this.updateUsername} required></input>
                 <br></br>

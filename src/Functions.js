@@ -11,6 +11,10 @@ const failURL = baseURL + "api/get_failures/"
 const createScrapURL = baseURL + "api/create_scrap/"
 const checkTokenURL = baseURL + "api/check_token/"
 const checkRefURL = baseURL + "api/check_refresh_token/"
+const closeScrapURL = baseURL + "api/close_scrap/"
+const openGraphURL =baseURL +"api/open_graph_data/"
+const closedGraphURL = baseURL+"api/closed_graph_data/"
+
 
 
 
@@ -205,6 +209,7 @@ async function getOpenScrap(page){
     let units = [];
     let index = [];
     let cost = [];
+    let scrapPK= [];
     const lenData = Object.keys(data).length;
 
     //data[0] = [page.has_next(), page.has_previous(), curr_page]
@@ -223,13 +228,14 @@ async function getOpenScrap(page){
         cost.push(data[`${i}`][6])
         time.push(data[`${i}`][7])
         units.push(data[`${i}`][8])
-        index.push(data[`${i}`][9])
+        index.push(data[`${i}`][10])
+        scrapPK.push(data[`${i}`][9])
 
 
     }
 
 
-    return {page, hasNext, hasPrev, numItem, prodID, desc, failure, isOpen, lotID, user, cost, time, units, index}
+    return {page, hasNext, hasPrev, numItem, prodID, desc, failure, isOpen, lotID, user, cost, time, units, index, scrapPK}
 }
 
 async function getClosedScrap(page){
@@ -272,6 +278,7 @@ async function getClosedScrap(page){
     let units = [];
     let index = [];
     let cost = [];
+    let scrapPK = [];
     const lenData = Object.keys(data).length;
 
     //data[0] = [page.has_next(), page.has_previous(), curr_page]
@@ -290,16 +297,18 @@ async function getClosedScrap(page){
         cost.push(data[`${i}`][6])
         time.push(data[`${i}`][7])
         units.push(data[`${i}`][8])
-        index.push(data[`${i}`][9])
+        index.push(data[`${i}`][10])
+        scrapPK.push(data[`${i}`][9])
+
 
 
     }
 
 
-    return {page, hasNext, hasPrev, numItem, prodID, desc, failure, isOpen, lotID, user, cost, time, units, index}
+    return {page, hasNext, hasPrev, numItem, prodID, desc, failure, isOpen, lotID, user, cost, time, units, index, scrapPK}
 }
 
-async function getGraphScrap(page){
+async function getGraphScrap(){
 
     var valid = await isTokenValid();
     if(valid === false){
@@ -342,6 +351,97 @@ async function getGraphScrap(page){
     return {prod1, prod2, prod3, prod1Desc,prod2Desc,prod3Desc, labels}
 
 }
+
+
+async function getOpenGraphScrap(){
+
+    var valid = await isTokenValid();
+    if(valid === false){
+        const ref = await isRefreshValid()
+
+        if(ref == true){
+            await getNewToken();
+        }
+        else{
+            throw "need to sign back in"
+        }
+    }
+
+    const response = await fetch(openGraphURL, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${window.localStorage.getItem('token')}`,
+            'Content-Type': 'application/json',
+        }
+    });
+
+    
+    var data = await response.json();
+    var products = data[1];
+    var labels = data[2];
+    data = data[0];
+
+    const prod1 = data[0];
+    const prod2 = data[1];
+    const prod3 = data[2];
+    const prod1Desc = products[0];
+    const prod2Desc = products[1];
+    const prod3Desc = products[2];
+    console.log(`our prod data is: ${prod1}| ${prod2} | ${prod3}`)
+    console.log(`our prod desc is: ${prod1Desc}| ${prod2Desc} | ${prod3Desc}`)
+    console.log(`our lables are: ${labels}`)
+
+
+
+    return {prod1, prod2, prod3, prod1Desc,prod2Desc,prod3Desc, labels}
+
+}
+
+
+async function getClosedGraphScrap(){
+
+    var valid = await isTokenValid();
+    if(valid === false){
+        const ref = await isRefreshValid()
+
+        if(ref == true){
+            await getNewToken();
+        }
+        else{
+            throw "need to sign back in"
+        }
+    }
+
+    const response = await fetch(closedGraphURL, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${window.localStorage.getItem('token')}`,
+            'Content-Type': 'application/json',
+        }
+    });
+
+    
+    var data = await response.json();
+    var products = data[1];
+    var labels = data[2];
+    data = data[0];
+
+    const prod1 = data[0];
+    const prod2 = data[1];
+    const prod3 = data[2];
+    const prod1Desc = products[0];
+    const prod2Desc = products[1];
+    const prod3Desc = products[2];
+    console.log(`our prod data is: ${prod1}| ${prod2} | ${prod3}`)
+    console.log(`our prod desc is: ${prod1Desc}| ${prod2Desc} | ${prod3Desc}`)
+    console.log(`our lables are: ${labels}`)
+
+
+
+    return {prod1, prod2, prod3, prod1Desc,prod2Desc,prod3Desc, labels}
+
+}
+
 
 async function getProd(){
 
@@ -490,4 +590,42 @@ async function submitScrap(lotID, user, cost, units, prodID, failure){
 
 
 
-export {getGraphScrap, submitScrap, getFailures, getProd, login, logout, isRefreshValid, getNewToken, isTokenValid, getOpenScrap, getClosedScrap }
+async function closeScrap(scrapID, comment){
+    
+
+    var valid = await isTokenValid();
+    if(valid === false){
+        const ref = await isRefreshValid()
+
+        if(ref == true){
+            await getNewToken();
+        }
+        else{
+            throw "need to sign back in"
+        }
+    }
+
+    const response = await fetch(closeScrapURL, {
+        method: 'POST',  
+        headers: {
+            'Authorization': `Bearer ${window.localStorage.getItem('token')}`,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            scrapID: scrapID,
+            comment: comment,
+        })
+    });
+
+    const data = await response.json()
+
+    if(data['scrap'] == 'scrap closed'){
+        return true
+    }else{
+        return false
+    }
+}
+
+
+
+export {getClosedGraphScrap, getOpenGraphScrap,closeScrap, getGraphScrap, submitScrap, getFailures, getProd, login, logout, isRefreshValid, getNewToken, isTokenValid, getOpenScrap, getClosedScrap }

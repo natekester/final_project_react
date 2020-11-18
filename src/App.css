@@ -2,6 +2,7 @@
   text-align: center;
 }
 
+
 .App-logo {
   height: auto;
   width: 50%;
@@ -31,30 +32,27 @@
 .App-link {
   color: #61dafb;
 }
-
 .nav_item{
   display: inline-block;
   padding: 2%;
   font-size: x-large;
+  border: 2px solid white;
+  color: white;
+  border-radius: 20%;
   
 }
 #logout{
+  color: grey;
   text-align: right;
-  font-size: x-small;
+  font-size: small;
   padding: 30px;
   padding-bottom: 0;
   padding-top: 0;
 }
-@keyframes App-logo-spin {
-  0%{
-    transform: rotate(0deg);
-  }
-  50%{
-    transform: rotate(10deg);
-  }
-  100%{
-    transform: rotate(0deg);
-  }
+.link_logout{
+  color: white;
+  border: 1px solid grey;
+  border-radius: 20%;
 }
 #username{
   color:black;
@@ -69,6 +67,17 @@
   margin: 15px;
 }
 #submitScrap{
+  color: black;
+  margin: 15px;
+}
+.graphButton{
+  color: black;
+  margin: 15px;
+  background-color: white;
+  border-radius: 20%;
+
+}
+#submitClose{
   color: black;
   margin: 15px;
 }
@@ -119,9 +128,42 @@
   text-align: left;
 
 }
-/* .scrDesc{
+#tracks{
 
-} */
+  max-height: 50px;
+  max-width: 50px;
+  margin-top: 14px;
+  margin-left:5px;
 
+}
+#tracks2{
+  margin-top: 10px;
+  margin-left:5px;
 
+  max-height: 30px;
+  max-width: 30px;
 
+}
+#scrapLogo{
+  font-style: italic;
+  margin: auto;
+  width: 30%;
+
+  display:flex; 
+  flex-direction: row;
+}
+#scrapLogo2{
+  font-style: italic;
+  margin: auto;
+  width: 88%;
+  font-size: x-small;
+
+  display:flex; 
+  flex-direction: row;
+}
+.scrapTracker2{
+  font-size: medium;
+}
+#newScrapDiv{
+  margin-left: 20px;
+}

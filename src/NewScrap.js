@@ -288,19 +288,19 @@ class NewScrap extends Component {
 
     render(){
         return (
-            <div>
+            <div id="newScrapDiv">
                 <h3>Create New Scrap:</h3>
 
                 <div className="row" >
                     <div className='col-md-12 col-xs-12' id="selectIdDiv">
-                    <label> User: </label>  {this.state.loggedInUser}
+                    <label> User:   {this.state.loggedInUser}</label>
                     </div>
                 </div>
 
                 <div className="row" >
                     <div className='col-md-10 col-xs-10' id="selectFailure">
-                    <label> lot ID: </label>
-                    <input  className="inputBox" type="textbox" onChange={this.updateLotID} required></input>
+                    <label> lot ID: 
+                    <input  className="inputBox" type="textbox" onChange={this.updateLotID} required></input> </label>
                     </div>
                     
                 </div>

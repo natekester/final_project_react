@@ -12,10 +12,7 @@ import {
   Switch,
   Route,
   withRouter
-  
 } from "react-router-dom";
-import ScatterGraph from "./ScatterGraph";
-
 
 
 class App extends Component {

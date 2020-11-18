@@ -1,174 +1,111 @@
 import React, {Component} from "react";
 import {Bar} from 'react-chartjs-2';
-import { Redirect } from "react-router-dom";
-import {HorizontalBar} from 'react-chartjs-2';
-import {getGraphScrap, getOpenScrap} from './Functions'
-const arbitraryStackKey = "stack1";
-
-
-
-const state = {
-  //I could setup the data by error column.
-  //need 3 data sections, by prodID
-  //scrap for each failure mode
-    labels: ['Etching error',  'handling error', 'contamination', 'viscocity', 'conductivity', 'poly'],
-    datasets: [
-      {
-          stack: arbitraryStackKey,
-          label: '',
-          backgroundColor: 'rgba(75,192,192,1)',
-          borderColor: 'rgba(0,0,0,1)',
-          borderWidth: 2,
-          data: []
-      },    
-  ]
-}
-
-const options = {
-
-    responsive: true,
-    maintainAspectRatio: false,
-    title:{
-      display:true,
-      text:'Scrap Dollars by Cause',
-      fontSize:24,
-      fontColor: "white",
-      fontStyle: 'bold'
-    },
-    scaleFontColor: 'red',
-
-    scales: {
-      xAxes: [{
-          fontSize:24,
-          fontColor: "white",
-          fontStyle: 'bold',
-
-          display: true,
-          labelString: "Dollars ($)",
-          format: d => `$${d}`,
-          ticks: {
-            fontColor: 'white'
-          },
-      }],
-      yAxes: [{
-        gridLines: {
-          color: '#ccc',
-        },
-        ticks: {
-          fontColor: 'white'
-        },
-      }]
-
-    },
-    legend:{
-      labels:{
-        fontColor: 'white',
-
-      },
-      responsive: true,
-      maintainAspectRatio: false,
-      display:true,
-      position:'top'
-    }
-}
-
-
+import ScrapGraphAll from './ScrapGraphAll';
+import ScrapGraphClosed from './ScrapGraphClosed';
+import ScrapGraphOpen from './ScrapGraphOpen';
+import {isRefreshValid} from'./Functions';
 
 class ScrapGraph extends Component {
   constructor(props){
     super(props); 
 
-    this.getData = this.getData.bind(this);
-
-
-
 
     this.state ={
-      data:'',
+      all: true,
+      open: false,
+      closed:false,
+      
 
-      loaded: false
     }
 
-    const ensureData  = async () => {
-      await this.getData();
-  }
+    this.showAllScrap = this.showAllScrap.bind(this);
+    this.showOpenScrap = this.showOpenScrap.bind(this);
+    this.showClosedScrap = this.showClosedScrap.bind(this);
+    this.checkIfLoggedIn = this.checkIfLoggedIn.bind(this);
 
-    ensureData();
-
-    
-
+    this.checkIfLoggedIn()
 
 
 
   }
 
-  async getData(){
-    let {prod1, prod2, prod3, prod1Desc,prod2Desc,prod3Desc, labels} = await getGraphScrap();
 
-    console.log(`Our labels are: ${labels}`)
-    console.log(`our prod1Desc: ${prod1Desc}`)
-    console.log(`our prod2Desc: ${prod2Desc}`)
-    console.log(`our prod3Desc: ${prod3Desc}`)
+  async checkIfLoggedIn(){
+    console.log('Checking if logged in on graph.')
 
-    
-    const data = {
-      //I could setup the data by error column.
-      //need 3 data sections, by prodID
-      //scrap for each failure mode
-        labels: labels,
-        datasets: [
-          {
-              stack: arbitraryStackKey,
-              label: prod1Desc,
-              backgroundColor: 'rgba(75,192,192,1)',
-              borderColor: 'rgba(0,0,0,1)',
-              borderWidth: 2,
-              data: prod1
-          },    
-          {
-            stack: arbitraryStackKey,
-            label: prod2Desc,
-            backgroundColor: 'rgba(90,192,90,1)',
-            borderColor: 'rgba(0,0,0,1)',
-            borderWidth: 2,
-            data: prod2
-        },
-        {
-          stack: arbitraryStackKey,
-          label: prod3Desc,
-          backgroundColor: 'rgba(150, 92, 192,1)',
-          borderColor: 'rgba(0,0,0,1)',
-          borderWidth: 2,
-          data: prod3
-        },
-      ]
+    try{
+      const valid = await isRefreshValid()
+      console.log(`our refresh check returned ${valid}`)
+      if(  valid === false){
+        
+        console.log('Need to log in again.')
+        this.props.pushLogin();
+      }
     }
+    catch(err){
+
+        console.log(err)
+
+        // this.props.logout();
+        this.props.pushLogin();
+
+    }
+
+  }
+
+  showAllScrap(){
+
 
     this.setState({
-      data: data,
-      loaded: true
+      all:true,
+      open: false,
+      closed: false,
     })
 
+  }
 
+  showOpenScrap(){
+
+
+    this.setState({
+      all: false,
+      open: true,
+      closed: false,
+    })
+    
+  }
+
+  showClosedScrap(){
+
+
+    this.setState({
+      all: false,
+      open: false,
+      closed: true,
+    })
+    
   }
 
 
   render() {
       return (
+        <div>
         <div id="graph" className="col-md-10 col-xs-12">
-          {this.state.loaded === false ? <Bar
-            data={state}
-            width={100}
-            height={300}      
-            options={options} 
-          />: <Bar
-          data={this.state.data}
-          width={100}
-          height={300}      
-          options={options} 
-        /> }
+        {this.state.all === true? <ScrapGraphAll></ScrapGraphAll>: ''}
+        {this.state.open === true ? <ScrapGraphOpen></ScrapGraphOpen>: ''}
+        {this.state.closed === true ? <ScrapGraphClosed></ScrapGraphClosed>: ''}
 
-          {/* <HorizontalBar data={state}></HorizontalBar> */}
+        </div>
+
+        <div className="row">
+        <input type="button" className="graphButton" value="All Scrap"  onClick={this.showAllScrap} >
+        </input>
+        <input type="button" className="graphButton" value="Closed Scrap" onClick={this.showClosedScrap}>
+        </input>
+        <input type="button" className="graphButton" value="Open Scrap"  onClick={this.showOpenScrap}>
+        </input>
+        </div>
+
         </div>
       );
   }
