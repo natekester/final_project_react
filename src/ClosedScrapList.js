@@ -216,12 +216,12 @@ class ClosedScrapList extends Component {
             <div className="scrap">
 
                 <h1> Closed Scrap List</h1>
-        {this.state.loaded == true ? this.state.index.map((i) => <ScrapItem index={i} user={this.state.user[i]} prodID={this.state.prodID[i]} scrapPK={this.state.scrapPK[i]} desc={this.state.desc[i]} failure={this.state.failure[i]} isOpen={this.state.isOpen[i]} lotID={this.state.lotID[i]} time={this.state.time[i]} units={this.state.units[i]} cost={this.state.cost[i]} ></ScrapItem>) : ''}
+        {this.state.loaded === true ? this.state.index.map((i) => <ScrapItem index={i} user={this.state.user[i]} prodID={this.state.prodID[i]} scrapPK={this.state.scrapPK[i]} desc={this.state.desc[i]} failure={this.state.failure[i]} isOpen={this.state.isOpen[i]} lotID={this.state.lotID[i]} time={this.state.time[i]} units={this.state.units[i]} cost={this.state.cost[i]} ></ScrapItem>) : ''}
 
 
                 <div className="row" >
-                    {this.state.hasNext == true ? <Link to={`/closedScrap?page=${this.state.nextPage}`} className="nav_item"  onClick={this.nextPage} value="Next page"> Next Page</Link> : ""}
-                    {this.state.hasPrev == true ?  <Link to={`/closedScrap?page=${this.state.prevPage}`} className="nav_item" onClick={this.prevPage} value="Prev page"> Previous Page</Link> : ""}
+                    {this.state.hasNext === true ? <Link to={`/closedScrap?page=${this.state.nextPage}`} className="nav_item"  onClick={this.nextPage} value="Next page"> Next Page</Link> : ""}
+                    {this.state.hasPrev === true ?  <Link to={`/closedScrap?page=${this.state.prevPage}`} className="nav_item" onClick={this.prevPage} value="Prev page"> Previous Page</Link> : ""}
                 </div>
             </div>
         );

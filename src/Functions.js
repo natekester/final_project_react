@@ -37,7 +37,7 @@ async function login(userName, password){
         const refreshToken = body['refresh_token'];
         const refID = body['ref_id'];
         
-        if( body['error'] == "creditials incorrect")
+        if( body['error'] === "creditials incorrect")
         {
             return false
 
@@ -106,15 +106,7 @@ async function isRefreshValid() {
         const data = await response.json()
         const token = data['token']
 
-        if (token.length > 0){
-    
-            return true
-
-        }else{
-    
-            return false
-    
-        }
+        return token === 'true';
 
 }
       
@@ -130,7 +122,7 @@ async function isTokenValid() {
 
     const data = await response.json()
 
-    if (data['token'] == 'is valid'){
+    if (data['token'] === 'is valid'){
         return true
     }else{
         localStorage.removeItem('token')
@@ -176,7 +168,7 @@ async function getOpenScrap(page){
     if(valid === false){
         const ref = await isRefreshValid()
 
-        if(ref == true){
+        if(ref === true){
             await getNewToken();
         }
         else{
@@ -245,7 +237,7 @@ async function getClosedScrap(page){
     if(valid === false){
         const ref = await isRefreshValid()
 
-        if(ref == true){
+        if(ref === true){
             await getNewToken();
         }
         else{
@@ -314,7 +306,7 @@ async function getGraphScrap(){
     if(valid === false){
         const ref = await isRefreshValid()
 
-        if(ref == true){
+        if(ref === true){
             await getNewToken();
         }
         else{
@@ -359,7 +351,7 @@ async function getOpenGraphScrap(){
     if(valid === false){
         const ref = await isRefreshValid()
 
-        if(ref == true){
+        if(ref === true){
             await getNewToken();
         }
         else{
@@ -404,7 +396,7 @@ async function getClosedGraphScrap(){
     if(valid === false){
         const ref = await isRefreshValid()
 
-        if(ref == true){
+        if(ref === true){
             await getNewToken();
         }
         else{
@@ -451,7 +443,7 @@ async function getProd(){
     if(valid === false){
         const ref = await isRefreshValid()
 
-        if(ref == true){
+        if(ref === true){
             await getNewToken();
         }
         else{
@@ -505,7 +497,7 @@ async function getFailures(id){
     if(valid === false){
         const ref = await isRefreshValid()
 
-        if(ref == true){
+        if(ref === true){
             await getNewToken();
         }
         else{
@@ -555,7 +547,7 @@ async function submitScrap(lotID, user, cost, units, prodID, failure){
     if(valid === false){
         const ref = await isRefreshValid()
 
-        if(ref == true){
+        if(ref === true){
             await getNewToken();
         }
         else{
@@ -581,7 +573,7 @@ async function submitScrap(lotID, user, cost, units, prodID, failure){
 
     const data = await response.json()
 
-    if(data['scrap'] == 'scrap created'){
+    if(data['scrap'] === 'scrap created'){
         return true
     }else{
         return false
@@ -597,7 +589,7 @@ async function closeScrap(scrapID, comment){
     if(valid === false){
         const ref = await isRefreshValid()
 
-        if(ref == true){
+        if(ref === true){
             await getNewToken();
         }
         else{
@@ -619,7 +611,7 @@ async function closeScrap(scrapID, comment){
 
     const data = await response.json()
 
-    if(data['scrap'] == 'scrap closed'){
+    if(data['scrap'] === 'scrap closed'){
         return true
     }else{
         return false

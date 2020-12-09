@@ -1,6 +1,6 @@
 
 import React, {Component} from "react";
-import {login, logout, isRefreshValid, getNewToken, isTokenValid } from "./Functions";
+import {login } from "./Functions";
 import tracks from './tracks.png';
 
 class Login extends Component {

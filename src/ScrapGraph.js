@@ -1,5 +1,4 @@
 import React, {Component} from "react";
-import {Bar} from 'react-chartjs-2';
 import ScrapGraphAll from './ScrapGraphAll';
 import ScrapGraphClosed from './ScrapGraphClosed';
 import ScrapGraphOpen from './ScrapGraphOpen';

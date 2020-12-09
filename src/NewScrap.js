@@ -55,7 +55,7 @@ class NewScrap extends Component {
             lotID: event.target.value
         });
 
-        if(this.state.selectedID == '' || event.target.value == '' || this.state.totalCost == 0 || this.state.selectedFailure == ''){
+        if(this.state.selectedID === '' || event.target.value === '' || this.state.totalCost === 0 || this.state.selectedFailure === ''){
             this.setState({
                 disabled: "true",
             })
@@ -140,7 +140,7 @@ class NewScrap extends Component {
 
         console.log(this.state.selectedID, event.target.value, this.state.totalCost, this.state.lotID)
 
-        if(this.state.selectedID == '' || event.target.value == '' || this.state.totalCost == 0 || this.state.lotID === ''){
+        if(this.state.selectedID === '' || event.target.value === '' || this.state.totalCost === 0 || this.state.lotID === ''){
             this.setState({
                 disabled: "true",
             })
@@ -162,7 +162,7 @@ class NewScrap extends Component {
         })
 
 
-        if(cost == 0 || this.state.lotID === '' || this.state.selectedID === '' || this.state.selectedFailure === ''){
+        if(cost === 0 || this.state.lotID === '' || this.state.selectedID === '' || this.state.selectedFailure === ''){
             this.setState({
                 disabled: "true",
             })
@@ -331,7 +331,7 @@ class NewScrap extends Component {
                      </div>
                 </div>
 
-                {this.state.display == 'true' ? 
+                {this.state.display === 'true' ? 
                 <div className="row" >
                     <div className='col-md-10 col-xs-10' id="selectFailure">
                         <label> Failure Mode: </label>

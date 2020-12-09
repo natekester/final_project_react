@@ -47,7 +47,7 @@ class App extends Component {
 
         this.pushOpenScrap();
 
-      }else if (valid == false){
+      }else if (valid === false){
         this.pushLogin()
 
       }
@@ -100,6 +100,8 @@ class App extends Component {
 
           <Switch>
 
+
+
             <Route path="/newScrap">
               <TopLayout pushLogin={this.pushLogin} logout={this.logout} graphDisplay={this.graphDisplay} openScrapListDisplay={this.openScrapListDisplay} closedScrapListDisplay={this.closedScrapListDisplay} createNewScrapDisplay={this.createNewScrapDisplay}></TopLayout>
               <NewScrap pushLogin={this.pushLogin} logout={this.logout} ></NewScrap>
@@ -124,6 +126,10 @@ class App extends Component {
             <Route path="/login">
               <Login loggedIn={this.loggedIn}></Login>
             </Route>
+            <Route path="/">
+              <Login loggedIn={this.loggedIn}></Login>
+            </Route>
+
 
           </Switch>
 
